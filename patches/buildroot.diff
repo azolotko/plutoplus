@@ -39,7 +39,7 @@ index a3b3f6f664..55601033c6 100644
 -https://wiki.analog.com/university/tools/pluto
 +https://github.com/plutoplus/plutoplus
 diff --git a/configs/zynq_pluto_defconfig b/configs/zynq_pluto_defconfig
-index 6203766e04..884adfcd30 100644
+index 6203766e04..f3b791ba18 100644
 --- a/configs/zynq_pluto_defconfig
 +++ b/configs/zynq_pluto_defconfig
 @@ -29,6 +29,7 @@ BR2_PACKAGE_MTD=y
@@ -50,7 +50,7 @@ index 6203766e04..884adfcd30 100644
  BR2_PACKAGE_LINUX_FIRMWARE=y
  BR2_PACKAGE_LINUX_FIRMWARE_RALINK_RT61=y
  BR2_PACKAGE_LINUX_FIRMWARE_RALINK_RT73=y
-@@ -36,24 +37,39 @@ BR2_PACKAGE_LINUX_FIRMWARE_RALINK_RT2XX=y
+@@ -36,24 +37,40 @@ BR2_PACKAGE_LINUX_FIRMWARE_RALINK_RT2XX=y
  BR2_PACKAGE_LINUX_FIRMWARE_RTL_81XX=y
  BR2_PACKAGE_LINUX_FIRMWARE_RTL_87XX=y
  BR2_PACKAGE_LINUX_FIRMWARE_RTL_88XX=y
@@ -89,10 +89,11 @@ index 6203766e04..884adfcd30 100644
  BR2_PACKAGE_WPA_SUPPLICANT_PASSPHRASE=y
 +BR2_PACKAGE_OPKG=n
 +BR2_PACKAGE_NANO=n
++BR2_PACKAGE_MG=y
  BR2_PACKAGE_POLL_SYSFS=y
  BR2_PACKAGE_AD936X_REF_CAL=y
  BR2_TARGET_ROOTFS_CPIO=y
-@@ -62,3 +78,15 @@ BR2_TARGET_ROOTFS_CPIO_UIMAGE=y
+@@ -62,3 +79,15 @@ BR2_TARGET_ROOTFS_CPIO_UIMAGE=y
  BR2_PACKAGE_HOST_DOSFSTOOLS=y
  BR2_PACKAGE_HOST_GENIMAGE=y
  BR2_PACKAGE_HOST_MTOOLS=y
@@ -108,3 +109,27 @@ index 6203766e04..884adfcd30 100644
 +BR2_PACKAGE_FFMPEG_DEMUXERS="aac h264 mpegts mpegvideo pcm_s16le rawvideo rtp hevc flv dvbsub"
 +BR2_PACKAGE_FFMPEG_PARSERS="aac h264 mjpeg mpegaudio mpegvideo hevc"
 +#BR2_PACKAGE_STRACE=y
+diff --git a/package/libffi/libffi.hash b/package/libffi/libffi.hash
+index 8d2349ec21..75be5bbcef 100644
+--- a/package/libffi/libffi.hash
++++ b/package/libffi/libffi.hash
+@@ -1,4 +1,4 @@
+ # Locally calculated
+-sha256  d66c56ad259a82cf2a9dfc408b32bf5da52371500b84745f7fb8b645712df676  libffi-3.4.4.tar.gz
++sha256  bc9842a18898bfacb0ed1252c4febcc7e78fa139fd27fdc7a3e30d9d9356119b  libffi-3.4.8.tar.gz
+ # License files, locally calculated
+-sha256  2c9c2acb9743e6b007b91350475308aee44691d96aa20eacef8e199988c8c388  LICENSE
++sha256  67894089811f93fca47a76f85e017da6f8582d4ba0905963c6e0f1ad6df7a195  LICENSE
+diff --git a/package/libffi/libffi.mk b/package/libffi/libffi.mk
+index 8f6844113c..813aaf2538 100644
+--- a/package/libffi/libffi.mk
++++ b/package/libffi/libffi.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-LIBFFI_VERSION = 3.4.4
++LIBFFI_VERSION = 3.4.8
+ LIBFFI_SITE = \
+ 	https://github.com/libffi/libffi/releases/download/v$(LIBFFI_VERSION)
+ LIBFFI_LICENSE = MIT
