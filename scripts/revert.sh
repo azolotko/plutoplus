@@ -1,3 +1,5 @@
+set -xe
+
 cd plutosdr-fw
 git checkout .
 cd hdl
