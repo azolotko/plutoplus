@@ -1,12 +1,75 @@
+diff --git a/projects/pluto/Makefile b/projects/pluto/Makefile
+index a8e40da6a..b9d24e943 100644
+--- a/projects/pluto/Makefile
++++ b/projects/pluto/Makefile
+@@ -12,12 +12,10 @@ M_DEPS += ../../library/util_cdc/sync_bits.v
+ M_DEPS += ../../library/common/util_pulse_gen.v
+ M_DEPS += ../../library/common/ad_iobuf.v
+ M_DEPS += ../../library/common/ad_bus_mux.v
+-M_DEPS += ../../library/axi_tdd/scripts/axi_tdd.tcl
+ M_DEPS += ../../library/axi_ad9361/axi_ad9361_delay.tcl
+ 
+ LIB_DEPS += axi_ad9361
+ LIB_DEPS += axi_dmac
+-LIB_DEPS += axi_tdd
+ LIB_DEPS += util_pack/util_cpack2
+ LIB_DEPS += util_pack/util_upack2
+ 
+diff --git a/projects/pluto/Readme.md b/projects/pluto/Readme.md
+index c42a660dd..d4879b01a 100755
+--- a/projects/pluto/Readme.md
++++ b/projects/pluto/Readme.md
+@@ -2,9 +2,7 @@
+ 
+ Here are some pointers to help you:
+   * [Board Product Page](https://www.analog.com/adalm-pluto)
+-  * [Board Product Page](https://www.analog.com/cn0566)
+   * Parts : [RF Agile Transceiver](https://www.analog.com/ad9363)
+   * Project Doc: https://wiki.analog.com/university/tools/pluto	
+-  * Project Doc: https://wiki.analog.com/resources/eval/user-guides/circuits-from-the-lab/cn0566
+   * HDL Doc: https://wiki.analog.com/resources/eval/user-guides/ad-fmcomms2-ebz/reference_hdl
+   * Linux Drivers: https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361
 diff --git a/projects/pluto/system_bd.tcl b/projects/pluto/system_bd.tcl
-index 0133b3f04..8add34040 100644
+index 0133b3f04..8dfe1ee65 100644
 --- a/projects/pluto/system_bd.tcl
 +++ b/projects/pluto/system_bd.tcl
-@@ -54,6 +54,13 @@ ad_ip_parameter sys_ps7 CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ 100.0
+@@ -5,7 +5,6 @@
+ 
+ # create board design
+ source $ad_hdl_dir/projects/common/xilinx/adi_fir_filter_bd.tcl
+-source $ad_hdl_dir/library/axi_tdd/scripts/axi_tdd.tcl
+ 
+ # default ports
+ 
+@@ -22,9 +21,9 @@ create_bd_port -dir I spi0_sdo_i
+ create_bd_port -dir O spi0_sdo_o
+ create_bd_port -dir I spi0_sdi_i
+ 
+-create_bd_port -dir I -from 17 -to 0 gpio_i
+-create_bd_port -dir O -from 17 -to 0 gpio_o
+-create_bd_port -dir O -from 17 -to 0 gpio_t
++create_bd_port -dir I -from 16 -to 0 gpio_i
++create_bd_port -dir O -from 16 -to 0 gpio_o
++create_bd_port -dir O -from 16 -to 0 gpio_t
+ 
+ create_bd_port -dir O spi_csn_o
+ create_bd_port -dir I spi_csn_i
+@@ -34,9 +33,6 @@ create_bd_port -dir I spi_sdo_i
+ create_bd_port -dir O spi_sdo_o
+ create_bd_port -dir I spi_sdi_i
+ 
+-create_bd_port -dir O txdata_o
+-create_bd_port -dir I tdd_ext_sync
+-
+ # instance: sys_ps7
+ 
+ ad_ip_instance processing_system7 sys_ps7
+@@ -53,7 +49,13 @@ ad_ip_parameter sys_ps7 CONFIG.PCW_EN_RST1_PORT 1
+ ad_ip_parameter sys_ps7 CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ 100.0
  ad_ip_parameter sys_ps7 CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ 200.0
  ad_ip_parameter sys_ps7 CONFIG.PCW_GPIO_EMIO_GPIO_ENABLE 1
- ad_ip_parameter sys_ps7 CONFIG.PCW_GPIO_EMIO_GPIO_IO 18
-+
+-ad_ip_parameter sys_ps7 CONFIG.PCW_GPIO_EMIO_GPIO_IO 18
++ad_ip_parameter sys_ps7 CONFIG.PCW_GPIO_EMIO_GPIO_IO 17
 +ad_ip_parameter sys_ps7 CONFIG.PCW_EN_ENET0 1
 +ad_ip_parameter sys_ps7 CONFIG.PCW_ENET0_PERIPHERAL_ENABLE 1
 +ad_ip_parameter sys_ps7 CONFIG.PCW_ENET0_ENET0_IO {MIO 16 .. 27}
@@ -16,7 +79,7 @@ index 0133b3f04..8add34040 100644
  ad_ip_parameter sys_ps7 CONFIG.PCW_SPI1_PERIPHERAL_ENABLE 0
  ad_ip_parameter sys_ps7 CONFIG.PCW_I2C0_PERIPHERAL_ENABLE 0
  ad_ip_parameter sys_ps7 CONFIG.PCW_UART1_PERIPHERAL_ENABLE 1
-@@ -61,16 +68,28 @@ ad_ip_parameter sys_ps7 CONFIG.PCW_UART1_UART1_IO {MIO 12 .. 13}
+@@ -61,16 +63,28 @@ ad_ip_parameter sys_ps7 CONFIG.PCW_UART1_UART1_IO {MIO 12 .. 13}
  ad_ip_parameter sys_ps7 CONFIG.PCW_I2C1_PERIPHERAL_ENABLE 0
  ad_ip_parameter sys_ps7 CONFIG.PCW_QSPI_PERIPHERAL_ENABLE 1
  ad_ip_parameter sys_ps7 CONFIG.PCW_QSPI_GRP_SINGLE_SS_ENABLE 1
@@ -47,7 +110,51 @@ index 0133b3f04..8add34040 100644
  ad_ip_parameter sys_ps7 CONFIG.PCW_IRQ_F2P_INTR 1
  ad_ip_parameter sys_ps7 CONFIG.PCW_IRQ_F2P_MODE REVERSE
  ad_ip_parameter sys_ps7 CONFIG.PCW_MIO_0_PULLUP {enabled}
-@@ -380,4 +399,3 @@ ad_connect sys_cpu_resetn axi_ad9361_dac_dma/m_src_axi_aresetn
+@@ -314,43 +328,12 @@ ad_connect  axi_ad9361/l_clk axi_ad9361_adc_dma/fifo_wr_clk
+ ad_connect  axi_ad9361/l_clk axi_ad9361_dac_dma/m_axis_aclk
+ ad_connect  cpack/fifo_wr_overflow axi_ad9361/adc_dovf
+ 
+-# External TDD
+-set TDD_CHANNEL_CNT 3
+-set TDD_DEFAULT_POL 0b110
+-set TDD_REG_WIDTH 32
+-set TDD_BURST_WIDTH 32
+-set TDD_SYNC_WIDTH 0
+-set TDD_SYNC_INT 0
+-set TDD_SYNC_EXT 1
+-set TDD_SYNC_EXT_CDC 1
+-ad_tdd_gen_create axi_tdd_0 $TDD_CHANNEL_CNT \
+-                            $TDD_DEFAULT_POL \
+-                            $TDD_REG_WIDTH \
+-                            $TDD_BURST_WIDTH \
+-                            $TDD_SYNC_WIDTH \
+-                            $TDD_SYNC_INT \
+-                            $TDD_SYNC_EXT \
+-                            $TDD_SYNC_EXT_CDC
+-
+-ad_ip_instance util_vector_logic logic_inv [list \
+-  C_OPERATION {not} \
+-  C_SIZE 1]
+-
+-ad_connect logic_inv/Op1  axi_ad9361/rst
+-ad_connect logic_inv/Res  axi_tdd_0/resetn
+-ad_connect axi_ad9361/l_clk axi_tdd_0/clk
+-ad_connect axi_tdd_0/sync_in tdd_ext_sync
+-ad_connect axi_tdd_0/tdd_channel_0 txdata_o
+-ad_connect axi_tdd_0/tdd_channel_1 axi_ad9361_adc_dma/sync
+-ad_connect axi_tdd_0/tdd_channel_2 axi_ad9361_dac_dma/sync
+-
+ # interconnects
+ 
+ ad_cpu_interconnect 0x79020000 axi_ad9361
+ ad_cpu_interconnect 0x7C400000 axi_ad9361_adc_dma
+ ad_cpu_interconnect 0x7C420000 axi_ad9361_dac_dma
+ ad_cpu_interconnect 0x7C430000 axi_spi
+-ad_cpu_interconnect 0x7C440000 axi_tdd_0
+ 
+ ad_ip_parameter sys_ps7 CONFIG.PCW_USE_S_AXI_HP1 {1}
+ ad_connect sys_cpu_clk sys_ps7/S_AXI_HP1_ACLK
+@@ -380,4 +363,3 @@ ad_connect sys_cpu_resetn axi_ad9361_dac_dma/m_src_axi_aresetn
  ad_cpu_interrupt ps-13 mb-13 axi_ad9361_adc_dma/irq
  ad_cpu_interrupt ps-12 mb-12 axi_ad9361_dac_dma/irq
  ad_cpu_interrupt ps-11 mb-11 axi_spi/ip2intc_irpt
@@ -423,3 +530,90 @@ index 3c5d49aa2..877a64074 100644
  adi_project_run pluto
  source $ad_hdl_dir/library/axi_ad9361/axi_ad9361_delay.tcl
 -
+diff --git a/projects/pluto/system_top.v b/projects/pluto/system_top.v
+index acb97bb70..08317af42 100644
+--- a/projects/pluto/system_top.v
++++ b/projects/pluto/system_top.v
+@@ -60,6 +60,9 @@ module system_top (
+   inout           fixed_io_ps_porb,
+   inout           fixed_io_ps_srstb,
+ 
++  inout           iic_scl,
++  inout           iic_sda,
++
+   input           rx_clk_in,
+   input           rx_frame_in,
+   input   [11:0]  rx_data_in,
+@@ -81,28 +84,16 @@ module system_top (
+   output          spi_mosi,
+   input           spi_miso,
+ 
+-  output          pl_gpio0,
+-  input           pl_gpio1,
+-  inout           pl_gpio2,
+-  inout           pl_gpio3,
+-  inout           pl_gpio4
++  output          pl_spi_clk_o,
++  output          pl_spi_mosi,
++  input           pl_spi_miso
+ );
+ 
+   // internal signals
+ 
+-  wire    [17:0]  gpio_i;
+-  wire    [17:0]  gpio_o;
+-  wire    [17:0]  gpio_t;
+-
+-  wire            iic_scl;
+-  wire            iic_sda;
+-  wire            phaser_enable;
+-  wire            pl_burst;
+-  wire            pl_muxout;
+-  wire            pl_spi_clk_o;
+-  wire            pl_spi_miso;
+-  wire            pl_spi_mosi;
+-  wire            pl_txdata;
++  wire    [16:0]  gpio_i;
++  wire    [16:0]  gpio_o;
++  wire    [16:0]  gpio_t;
+ 
+   // instantiations
+ 
+@@ -118,27 +109,6 @@ module system_top (
+               gpio_status}));     //  7: 0
+ 
+   assign gpio_i[16:14] = gpio_o[16:14];
+-  assign gpio_i[17] = pl_muxout;
+-  assign phaser_enable = gpio_o[14];
+-
+-  assign pl_gpio4 = iic_scl;      //PL_GPIO4
+-  assign pl_gpio3 = iic_sda;      //PL_GPIO3
+-
+-  //PL_GPIO2
+-  ad_iobuf #(
+-    .DATA_WIDTH(1)
+-  ) i_pl_gpio_iobuf (
+-    .dio_t (phaser_enable),
+-    .dio_i (pl_spi_clk_o),
+-    .dio_o (pl_muxout),
+-    .dio_p (pl_gpio2));
+-
+-  //PL_GPIO1
+-  assign pl_spi_miso = pl_gpio1 & ~phaser_enable;
+-  assign pl_burst    = pl_gpio1 &  phaser_enable;
+-
+-  //PL_GPIO0
+-  assign pl_gpio0 = phaser_enable ? pl_txdata : pl_spi_mosi;
+ 
+   system_wrapper i_system_wrapper (
+     .ddr_addr (ddr_addr),
+@@ -190,9 +160,6 @@ module system_top (
+     .spi_sdo_i(1'b0),
+     .spi_sdo_o(pl_spi_mosi),
+ 
+-    .tdd_ext_sync(pl_burst),
+-    .txdata_o(pl_txdata),
+-
+     .tx_clk_out (tx_clk_out),
+     .tx_data_out (tx_data_out),
+     .tx_frame_out (tx_frame_out),
