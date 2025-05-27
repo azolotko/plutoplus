@@ -1,3 +1,5 @@
+set -xe
+
 cd plutosdr-fw
 git diff --ignore-submodules > ../patches/fw.diff
 cd hdl

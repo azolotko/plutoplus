@@ -320,10 +320,10 @@ index 08c5a42204f3..0fe5bba8a082 100644
  	status = "okay";
  
 diff --git a/arch/arm/boot/dts/zynq-zc702.dts b/arch/arm/boot/dts/zynq-zc702.dts
-index aa084a9938d9..b91785c93349 100644
+index 27fb48bd8eed..c41ff0e7b4b9 100644
 --- a/arch/arm/boot/dts/zynq-zc702.dts
 +++ b/arch/arm/boot/dts/zynq-zc702.dts
-@@ -57,6 +57,14 @@ led-ds23 {
+@@ -60,6 +60,14 @@ led-ds23 {
  			linux,default-trigger = "heartbeat";
  		};
  	};
@@ -338,7 +338,7 @@ index aa084a9938d9..b91785c93349 100644
  };
  
  &can0 {
-@@ -441,6 +449,7 @@ &uart1 {
+@@ -444,6 +452,7 @@ &uart1 {
  &usb0 {
  	status = "okay";
  	dr_mode = "host";
@@ -347,10 +347,10 @@ index aa084a9938d9..b91785c93349 100644
  	pinctrl-0 = <&pinctrl_usb0_default>;
  };
 diff --git a/arch/arm/boot/dts/zynq-zc706.dts b/arch/arm/boot/dts/zynq-zc706.dts
-index 6a6e8312b3f7..cb6e9117f3a3 100644
+index 835813c424e5..eaa478b3d4f0 100644
 --- a/arch/arm/boot/dts/zynq-zc706.dts
 +++ b/arch/arm/boot/dts/zynq-zc706.dts
-@@ -27,6 +27,14 @@ chosen {
+@@ -29,6 +29,14 @@ chosen {
  		bootargs = "";
  		stdout-path = "serial0:115200n8";
  	};
@@ -365,7 +365,7 @@ index 6a6e8312b3f7..cb6e9117f3a3 100644
  };
  
  &clkc {
-@@ -352,6 +360,7 @@ &uart1 {
+@@ -355,6 +363,7 @@ &uart1 {
  &usb0 {
  	status = "okay";
  	dr_mode = "host";
@@ -399,10 +399,10 @@ index 60f73cd2601b..2d531a6ea2ca 100644
 +	usb-phy = <&usb_phy0>;
  };
 diff --git a/arch/arm/configs/zynq_pluto_defconfig b/arch/arm/configs/zynq_pluto_defconfig
-index 506eec34f4b4..818b84bddc05 100644
+index 47b7b92fbeda..05131e8f4463 100644
 --- a/arch/arm/configs/zynq_pluto_defconfig
 +++ b/arch/arm/configs/zynq_pluto_defconfig
-@@ -269,3 +269,15 @@ CONFIG_RCU_CPU_STALL_TIMEOUT=60
+@@ -266,3 +266,15 @@ CONFIG_RCU_CPU_STALL_TIMEOUT=60
  CONFIG_DEBUG_LL=y
  CONFIG_DEBUG_ZYNQ_UART1=y
  CONFIG_EARLY_PRINTK=y
